@@ -1,9 +1,8 @@
 package kipi.dto
 
-import kotlinx.serialization.Serializable
+import java.io.Serializable
 
-@Serializable
 data class SessionResponse(
     val userId: Long,
     val token: String
-)
+) : Serializable

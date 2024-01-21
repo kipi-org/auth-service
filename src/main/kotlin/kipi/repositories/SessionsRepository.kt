@@ -19,13 +19,13 @@ import java.util.*
 
 class SessionsRepository {
 
-    fun createSession(id: Long) = transaction {
+    fun createSession(id: Long, sessionLiveTimeMin: Long) = transaction {
         val now = now()
 
         Sessions.insert {
             it[userId] = id
             it[token] = UUID.randomUUID().toString()
-            it[expiredAt] = now.plusMinutes(15)
+            it[expiredAt] = now.plusMinutes(sessionLiveTimeMin)
             it[initAt] = now
         }.resultedValues?.map { mapToSession(it) }?.firstOrNull() ?: throw SessionException("Session not created")
     }

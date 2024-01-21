@@ -1,5 +1,6 @@
 package kipi.services
 
+import kipi.Config
 import kipi.dto.Credentials
 import kipi.dto.Session
 import kipi.dto.User
@@ -13,7 +14,8 @@ import java.time.LocalDateTime.now
 
 class AuthService(
     private val usersRepository: UsersRepository,
-    private val sessionsRepository: SessionsRepository
+    private val sessionsRepository: SessionsRepository,
+    private val config: Config
 ) {
     fun registration(userInfo: Credentials) = with(userInfo) {
         validate(userInfo)
@@ -26,13 +28,16 @@ class AuthService(
                 hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt())
             )
         )
-        return@with sessionsRepository.createSession(userId)
+        return@with sessionsRepository.createSession(userId, config.sessionLiveTimeMin)
     }
 
     fun login(userInfo: Credentials) = with(userInfo) {
         val user = usersRepository.findUserByUsername(username) ?: throw AuthException("Incorrect username or password")
 
-        if (BCrypt.checkpw(password, user.hashedPassword)) return@with sessionsRepository.createSession(user.id!!)
+        if (BCrypt.checkpw(password, user.hashedPassword)) return@with sessionsRepository.createSession(
+            user.id!!,
+            config.sessionLiveTimeMin
+        )
         else throw AuthException("Incorrect username or password")
     }
 
@@ -50,6 +55,6 @@ class AuthService(
         val oldSession = sessionsRepository.findSession(token) ?: throw SessionException("Unknown session")
         sessionsRepository.deleteSession(token)
 
-        return sessionsRepository.createSession(oldSession.userId)
+        return sessionsRepository.createSession(oldSession.userId, config.sessionLiveTimeMin)
     }
 }

@@ -6,9 +6,11 @@ import kipi.repositories.UsersRepository
 import kipi.services.AuthService
 
 class Dependencies {
+    val config = Config()
+
     private val usersRepository = UsersRepository()
     private val sessionsRepository = SessionsRepository()
-    private val authService = AuthService(usersRepository, sessionsRepository)
+    private val authService = AuthService(usersRepository, sessionsRepository, config)
 
     val registrationController = RegistrationController(authService)
     val loginController = LoginController(authService)

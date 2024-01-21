@@ -9,6 +9,10 @@ import io.ktor.server.util.*
 
 fun Application.routes(deps: Dependencies) = with(deps) {
     routing {
+        get("/health") {
+            call.respond(OK)
+        }
+
         post("/registration") {
             val sessionResponse = registrationController.handle(call.receive())
 

@@ -1,9 +1,8 @@
 package kipi.dto
 
-import kotlinx.serialization.Serializable
+import java.io.Serializable
 
-@Serializable
 data class Credentials(
     val username: String,
     val password: String
-)
+) : Serializable

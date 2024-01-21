@@ -1,5 +1,6 @@
 package kipi.dto
 
+import java.io.Serializable
 import java.time.LocalDateTime
 
 data class Session(
@@ -8,4 +9,4 @@ data class Session(
     val token: String,
     val expiredAt: LocalDateTime,
     val initAt: LocalDateTime
-)
+) : Serializable
