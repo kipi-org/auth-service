@@ -6,6 +6,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
+import kipi.dto.Credentials
+import kipi.dto.IdCredentials
 
 fun Application.routes(deps: Dependencies) = with(deps) {
     routing {
@@ -13,14 +15,20 @@ fun Application.routes(deps: Dependencies) = with(deps) {
             call.respond(OK)
         }
 
-        post("/registration") {
-            val sessionResponse = registrationController.handle(call.receive())
+        post<Credentials>("/registration") {
+            val sessionResponse = registrationController.handle(it)
 
             call.respond(OK, sessionResponse)
         }
 
-        post("/login") {
-            val sessionResponse = loginController.handle(call.receive())
+        post<Credentials>("/login") {
+            val sessionResponse = loginController.handle(it)
+
+            call.respond(OK, sessionResponse)
+        }
+
+        post<IdCredentials>("/loginById") {
+            val sessionResponse = loginByIdController.handle(it)
 
             call.respond(OK, sessionResponse)
         }

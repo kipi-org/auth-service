@@ -25,6 +25,12 @@ class UsersRepository {
         }.map { mapToUser(it) }.firstOrNull()
     }
 
+    fun findUserById(id: Long) = transaction {
+        Users.select {
+            Users.id eq id
+        }.map { mapToUser(it) }.firstOrNull()
+    }
+
     private fun mapToUser(resultRow: ResultRow): User = User(
         id = resultRow[id],
         username = resultRow[username],

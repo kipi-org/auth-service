@@ -2,6 +2,7 @@ package kipi.services
 
 import kipi.Config
 import kipi.dto.Credentials
+import kipi.dto.IdCredentials
 import kipi.dto.Session
 import kipi.dto.User
 import kipi.exceptions.AuthException
@@ -33,6 +34,16 @@ class AuthService(
 
     fun login(userInfo: Credentials) = with(userInfo) {
         val user = usersRepository.findUserByUsername(username) ?: throw AuthException("Incorrect username or password")
+
+        if (BCrypt.checkpw(password, user.hashedPassword)) return@with sessionsRepository.createSession(
+            user.id!!,
+            config.sessionLiveTimeMin
+        )
+        else throw AuthException("Incorrect username or password")
+    }
+
+    fun login(userInfo: IdCredentials) = with(userInfo) {
+        val user = usersRepository.findUserById(id) ?: throw AuthException("Incorrect username or password")
 
         if (BCrypt.checkpw(password, user.hashedPassword)) return@with sessionsRepository.createSession(
             user.id!!,
