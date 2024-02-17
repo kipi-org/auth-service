@@ -1,10 +1,7 @@
 package kipi.services
 
 import kipi.Config
-import kipi.dto.Credentials
-import kipi.dto.IdCredentials
-import kipi.dto.Session
-import kipi.dto.User
+import kipi.dto.*
 import kipi.exceptions.AuthException
 import kipi.exceptions.SessionException
 import kipi.repositories.SessionsRepository
@@ -18,7 +15,7 @@ class AuthService(
     private val sessionsRepository: SessionsRepository,
     private val config: Config
 ) {
-    fun registration(userInfo: Credentials) = with(userInfo) {
+    fun registration(userInfo: Credentials): TokensBlock = with(userInfo) {
         validate(userInfo)
 
         if (usersRepository.findUserByUsername(username) != null) throw AuthException("auth.username.exist")
@@ -29,43 +26,64 @@ class AuthService(
                 hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt())
             )
         )
-        return@with sessionsRepository.createSession(userId, config.sessionLiveTimeMin)
+
+        createSessions(userId)
     }
 
-    fun login(userInfo: Credentials) = with(userInfo) {
+    fun login(userInfo: Credentials): TokensBlock = with(userInfo) {
         val user = usersRepository.findUserByUsername(username) ?: throw AuthException("auth.credentials.incorrect")
 
-        if (BCrypt.checkpw(password, user.hashedPassword)) return@with sessionsRepository.createSession(
-            user.id!!,
-            config.sessionLiveTimeMin
-        )
-        else throw AuthException("auth.credentials.incorrect")
+        if (BCrypt.checkpw(password, user.hashedPassword)) {
+            createSessions(user.id!!)
+        } else throw AuthException("auth.credentials.incorrect")
     }
 
-    fun login(userInfo: IdCredentials) = with(userInfo) {
+    fun login(userInfo: IdCredentials): TokensBlock = with(userInfo) {
         val user = usersRepository.findUserById(id) ?: throw AuthException("auth.credentials.incorrect")
 
-        if (BCrypt.checkpw(password, user.hashedPassword)) return@with sessionsRepository.createSession(
-            user.id!!,
-            config.sessionLiveTimeMin
-        )
-        else throw AuthException("auth.credentials.incorrect")
+        if (BCrypt.checkpw(password, user.hashedPassword)) {
+            createSessions(user.id!!)
+        } else throw AuthException("auth.credentials.incorrect")
     }
 
-    fun logout(token: String) = sessionsRepository.deleteSession(token)
+    fun logout(token: String) {
+        val session = sessionsRepository.findSession(token)
+
+        when {
+            session == null -> return
+            session.refreshToken == null -> return
+            else -> sessionsRepository.forceDeleteSession(session.id, session.refreshToken)
+        }
+    }
 
     fun verify(token: String): Session {
         val session = sessionsRepository.findSession(token) ?: throw SessionException("auth.session.not.exist")
 
+        if (session.refreshToken == null) throw SessionException("auth.session.illegal.token")
         if (session.expiredAt <= now()) throw SessionException("auth.session.expired")
 
         return session
     }
 
-    fun revoke(token: String): Session {
-        val oldSession = sessionsRepository.findSession(token) ?: throw SessionException("auth.session.not.exist")
-        sessionsRepository.deleteSession(token)
+    fun revoke(refreshToken: String): Session {
+        val refreshSession =
+            sessionsRepository.findSession(refreshToken) ?: throw SessionException("auth.session.not.exist")
 
-        return sessionsRepository.createSession(oldSession.userId, config.sessionLiveTimeMin)
+        if (refreshSession.refreshToken != null) throw SessionException("auth.session.illegal.token")
+        if (refreshSession.expiredAt <= now()) throw SessionException("auth.session.expired")
+
+        return sessionsRepository.createSession(
+            refreshSession.userId,
+            config.sessionAccessLiveTimeMin,
+            refreshSession.id
+        )
+    }
+
+    private fun createSessions(userId: Long): TokensBlock {
+        val refreshSession = sessionsRepository.createSession(userId, config.sessionRefreshLiveTimeMin)
+        val accessSession =
+            sessionsRepository.createSession(userId, config.sessionRefreshLiveTimeMin, refreshSession.id)
+
+        return TokensBlock(accessSession, refreshSession)
     }
 }

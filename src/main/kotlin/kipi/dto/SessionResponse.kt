@@ -4,5 +4,6 @@ import java.io.Serializable
 
 data class SessionResponse(
     val userId: Long,
-    val token: String
+    val refreshToken: String? = null,
+    val accessToken: String,
 ) : Serializable

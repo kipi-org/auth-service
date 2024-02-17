@@ -18,5 +18,6 @@ class Config {
     val dbName = getEnv("DB_NAME")
     val dbUser = getEnv("DB_USER")
     val dbPassword = getEnv("DB_PASSWORD")
-    val sessionLiveTimeMin = get("session.liveTimeMin").toLong()
+    val sessionAccessLiveTimeMin = get("session.access.liveTimeMin").toLong()
+    val sessionRefreshLiveTimeMin = get("session.refresh.liveTimeMin").toLong()
 }

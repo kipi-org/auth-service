@@ -32,4 +32,10 @@
         <createSequence sequenceName="session_id_seq"/>
     </changeSet>
 
+    <changeSet author="masadf" id="202402171656">
+        <addColumn tableName="sessions">
+            <column name="refreshTokenId"
+                    type="number"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

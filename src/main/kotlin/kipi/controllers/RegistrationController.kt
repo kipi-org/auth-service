@@ -8,8 +8,12 @@ class RegistrationController(
     private val authService: AuthService
 ) {
     fun handle(userInfo: Credentials): SessionResponse {
-        val session = authService.registration(userInfo)
+        val sessions = authService.registration(userInfo)
 
-        return SessionResponse(session.userId, session.token)
+        return SessionResponse(
+            sessions.refreshSession.userId,
+            sessions.refreshSession.token,
+            sessions.accessSession.token
+        )
     }
 }
