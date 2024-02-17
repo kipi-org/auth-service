@@ -21,7 +21,7 @@ class AuthService(
     fun registration(userInfo: Credentials) = with(userInfo) {
         validate(userInfo)
 
-        if (usersRepository.findUserByUsername(username) != null) throw AuthException("Username already exist")
+        if (usersRepository.findUserByUsername(username) != null) throw AuthException("auth.username.exist")
 
         val userId = usersRepository.createUser(
             User(
@@ -33,37 +33,37 @@ class AuthService(
     }
 
     fun login(userInfo: Credentials) = with(userInfo) {
-        val user = usersRepository.findUserByUsername(username) ?: throw AuthException("Incorrect username or password")
+        val user = usersRepository.findUserByUsername(username) ?: throw AuthException("auth.credentials.incorrect")
 
         if (BCrypt.checkpw(password, user.hashedPassword)) return@with sessionsRepository.createSession(
             user.id!!,
             config.sessionLiveTimeMin
         )
-        else throw AuthException("Incorrect username or password")
+        else throw AuthException("auth.credentials.incorrect")
     }
 
     fun login(userInfo: IdCredentials) = with(userInfo) {
-        val user = usersRepository.findUserById(id) ?: throw AuthException("Incorrect username or password")
+        val user = usersRepository.findUserById(id) ?: throw AuthException("auth.credentials.incorrect")
 
         if (BCrypt.checkpw(password, user.hashedPassword)) return@with sessionsRepository.createSession(
             user.id!!,
             config.sessionLiveTimeMin
         )
-        else throw AuthException("Incorrect username or password")
+        else throw AuthException("auth.credentials.incorrect")
     }
 
     fun logout(token: String) = sessionsRepository.deleteSession(token)
 
     fun verify(token: String): Session {
-        val session = sessionsRepository.findSession(token) ?: throw SessionException("Session not exist")
+        val session = sessionsRepository.findSession(token) ?: throw SessionException("auth.session.not.exist")
 
-        if (session.expiredAt <= now()) throw SessionException("Session expired")
+        if (session.expiredAt <= now()) throw SessionException("auth.session.expired")
 
         return session
     }
 
     fun revoke(token: String): Session {
-        val oldSession = sessionsRepository.findSession(token) ?: throw SessionException("Unknown session")
+        val oldSession = sessionsRepository.findSession(token) ?: throw SessionException("auth.session.not.exist")
         sessionsRepository.deleteSession(token)
 
         return sessionsRepository.createSession(oldSession.userId, config.sessionLiveTimeMin)

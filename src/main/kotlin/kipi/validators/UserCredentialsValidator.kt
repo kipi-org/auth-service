@@ -12,10 +12,10 @@ object UserCredentialsValidator {
         val errors = ArrayList<ValidationError>()
 
         if (!credentials.username.matches(USERNAME_PATTERN))
-            errors.add(ValidationError("username", "Invalid format"))
+            errors.add(ValidationError("username", "auth.param.incorrect.format"))
 
         if (!credentials.password.matches(PASSWORD_PATTERN))
-            errors.add(ValidationError("password", "Invalid format"))
+            errors.add(ValidationError("password", "auth.param.incorrect.format"))
 
         if (errors.isNotEmpty()) throw ValidationException(errors)
     }
