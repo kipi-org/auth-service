@@ -37,6 +37,12 @@ class SessionsRepository {
         }
     }
 
+    fun deleteAllUserSessions(userId: Long) = transaction {
+        Sessions.deleteWhere {
+            Sessions.userId eq userId
+        }
+    }
+
     fun findSession(token: String) = transaction {
         Sessions.select {
             Sessions.token eq token

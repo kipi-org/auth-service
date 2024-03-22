@@ -56,6 +56,11 @@ class AuthService(
         }
     }
 
+    fun deleteUser(userId: Long) {
+        sessionsRepository.deleteAllUserSessions(userId)
+        usersRepository.deleteByUserId(userId)
+    }
+
     fun verify(token: String): Session {
         val session = sessionsRepository.findSession(token) ?: throw SessionException("auth.session.not.exist")
 

@@ -38,6 +38,12 @@ fun Application.routes(deps: Dependencies) = with(deps) {
             call.respond(OK)
         }
 
+        delete("/user/{userId}") {
+            deleteUserController.handle(call.userId)
+
+            call.respond(OK)
+        }
+
         get("/verify") {
             val sessionResponse = verifyController.handle(call.token)
 
@@ -53,3 +59,4 @@ fun Application.routes(deps: Dependencies) = with(deps) {
 }
 
 private val ApplicationCall.token: String get() = this.parameters.getOrFail("token")
+private val ApplicationCall.userId: Long get() = this.parameters.getOrFail("userId").toLong()

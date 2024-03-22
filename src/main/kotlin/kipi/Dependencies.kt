@@ -16,6 +16,7 @@ class Dependencies {
     val loginController = LoginController(authService)
     val loginByIdController = LoginByIdController(authService)
     val logoutController = LogoutController(authService)
+    val deleteUserController = DeleteUserController(authService)
     val verifyController = VerifyController(authService)
     val revokeController = RevokeController(authService)
 }
