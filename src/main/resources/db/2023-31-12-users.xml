@@ -38,4 +38,15 @@
                     type="number"/>
         </addColumn>
     </changeSet>
+
+    <changeSet author="masadf" id="202404062321">
+        <addColumn tableName="users">
+            <column name="currentRecoverCode"
+                    type="varchar"/>
+        </addColumn>
+        <addColumn tableName="users">
+            <column name="recoverCodeExpiredAt"
+                    type="timestamp"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

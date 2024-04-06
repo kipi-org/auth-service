@@ -7,6 +7,8 @@ import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import kipi.dto.Credentials
 import kipi.dto.IdCredentials
+import kipi.dto.RecoverConfirmRequest
+import kipi.dto.RecoverRequest
 
 fun Application.routes(deps: Dependencies) = with(deps) {
     routing {
@@ -24,6 +26,20 @@ fun Application.routes(deps: Dependencies) = with(deps) {
             val sessionResponse = loginController.handle(it)
 
             call.respond(OK, sessionResponse)
+        }
+
+        route("/recover") {
+            post<RecoverRequest> {
+                recoverController.handle(it)
+
+                call.respond(OK)
+            }
+
+            post<RecoverConfirmRequest>("/confirm") {
+                recoverConfirmController.handle(it)
+
+                call.respond(OK)
+            }
         }
 
         post<IdCredentials>("/loginById") {

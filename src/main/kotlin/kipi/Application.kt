@@ -22,7 +22,7 @@ import kipi.db.DataSourceConfigurator
 import kipi.db.DbMigration
 import kipi.dto.ErrorResponse
 import kipi.exceptions.AuthException
-import kipi.exceptions.SessionException
+import kipi.exceptions.RecoverPasswordException
 import kipi.exceptions.ValidationException
 import org.jetbrains.exposed.sql.Database
 
@@ -50,7 +50,11 @@ fun Application.init() {
             call.respond(Forbidden, ErrorResponse(cause.message!!))
         }
 
-        exception<SessionException> { call, cause ->
+        exception<ValidationException> { call, cause ->
+            call.respond(Forbidden, cause.message!!)
+        }
+
+        exception<RecoverPasswordException> { call, cause ->
             call.respond(Unauthorized, ErrorResponse(cause.message!!))
         }
 

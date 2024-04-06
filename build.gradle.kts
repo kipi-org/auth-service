@@ -41,6 +41,8 @@ dependencies {
     implementation("io.ktor:ktor-server-host-common-jvm:2.3.7")
     implementation("io.ktor:ktor-server-status-pages-jvm:2.3.7")
 
+    implementation("org.apache.commons:commons-email:1.5")
+
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }

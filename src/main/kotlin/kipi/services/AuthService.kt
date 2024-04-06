@@ -3,6 +3,7 @@ package kipi.services
 import kipi.Config
 import kipi.dto.*
 import kipi.exceptions.AuthException
+import kipi.exceptions.RecoverPasswordException
 import kipi.exceptions.SessionException
 import kipi.repositories.SessionsRepository
 import kipi.repositories.UsersRepository
@@ -82,6 +83,20 @@ class AuthService(
             config.sessionAccessLiveTimeMin,
             refreshSession.id
         )
+    }
+
+    fun updateRecoverCode(userId: Long, code: String) {
+        usersRepository.updateRecoverPasswordInfo(userId, code)
+    }
+
+    fun confirmRecover(recoverConfirmRequest: RecoverConfirmRequest) {
+        val user = usersRepository.findUserById(recoverConfirmRequest.userId)
+
+        if (!(user?.currentRecoverCode == recoverConfirmRequest.code && now() > user.recoverCodeExpiredAt))
+            throw RecoverPasswordException("auth.otpCode.error")
+
+        sessionsRepository.deleteAllUserSessions(user.id!!)
+        usersRepository.updatePassword(user.id, BCrypt.hashpw(recoverConfirmRequest.newPassword, BCrypt.gensalt()))
     }
 
     private fun createSessions(userId: Long): TokensBlock {
