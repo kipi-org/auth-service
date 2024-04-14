@@ -115,7 +115,7 @@ class AuthService(
     }
 
     private fun User.isCodeValid(code: String){
-        if (!(currentRecoverCode == code && now() > recoverCodeExpiredAt))
+        if (!(currentRecoverCode == code && now() <= recoverCodeExpiredAt))
             throw RecoverPasswordException("auth.otpCode.error")
     }
 }
