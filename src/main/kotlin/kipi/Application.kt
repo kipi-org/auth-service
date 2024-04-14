@@ -9,7 +9,6 @@ import com.fasterxml.jackson.module.kotlin.jsonMapper
 import com.fasterxml.jackson.module.kotlin.kotlinModule
 import io.ktor.http.ContentType.Application.Json
 import io.ktor.http.HttpStatusCode.Companion.Forbidden
-import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.http.HttpStatusCode.Companion.UnprocessableEntity
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -55,7 +54,7 @@ fun Application.init() {
         }
 
         exception<RecoverPasswordException> { call, cause ->
-            call.respond(Unauthorized, ErrorResponse(cause.message!!))
+            call.respond(Forbidden, ErrorResponse(cause.message!!))
         }
 
         exception<ValidationException> { call, cause ->
