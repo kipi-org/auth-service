@@ -5,10 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import kipi.dto.Credentials
-import kipi.dto.IdCredentials
-import kipi.dto.RecoverConfirmRequest
-import kipi.dto.RecoverRequest
+import kipi.dto.*
 
 fun Application.routes(deps: Dependencies) = with(deps) {
     routing {
@@ -20,6 +17,12 @@ fun Application.routes(deps: Dependencies) = with(deps) {
             val sessionResponse = registrationController.handle(it)
 
             call.respond(OK, sessionResponse)
+        }
+
+        post<EmailConfirmRequest>("/email/confirm") {
+            emailConfirmController.handle(it)
+
+            call.respond(OK)
         }
 
         post<Credentials>("/login") {

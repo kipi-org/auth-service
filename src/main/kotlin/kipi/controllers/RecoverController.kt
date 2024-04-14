@@ -4,7 +4,7 @@ import kipi.dto.Notification
 import kipi.dto.RecoverRequest
 import kipi.services.AuthService
 import kipi.services.NotificationService
-import kipi.utils.RecoverPasswordUtils.generateCode
+import kipi.utils.ConfirmationUtils.generateCode
 
 class RecoverController(
     private val notificationService: NotificationService,
@@ -12,7 +12,7 @@ class RecoverController(
 ) {
     fun handle(recoverRequest: RecoverRequest) {
         val code = generateCode()
-        authService.updateRecoverCode(recoverRequest.userId, code)
+        authService.updateConfirmCode(recoverRequest.userId, code)
         notificationService.sendNotification(
             Notification(
                 beneficiary = recoverRequest.email,

@@ -4,5 +4,6 @@ import java.io.Serializable
 
 data class Credentials(
     val username: String,
-    val password: String
+    val password: String,
+    val email: String? = null
 ) : Serializable

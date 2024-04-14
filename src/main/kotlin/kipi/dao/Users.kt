@@ -9,5 +9,6 @@ object Users : Table("users") {
     val hashedPassword = varchar("hashedPassword", 60)
     val currentRecoverCode = varchar("currentRecoverCode", 4).nullable()
     val recoverCodeExpiredAt = datetime("recoverCodeExpiredAt").nullable()
+    val isEmailConfirmed = bool("isEmailConfirmed")
     override val primaryKey = PrimaryKey(id)
 }

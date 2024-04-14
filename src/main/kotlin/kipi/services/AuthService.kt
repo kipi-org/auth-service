@@ -85,15 +85,22 @@ class AuthService(
         )
     }
 
-    fun updateRecoverCode(userId: Long, code: String) {
-        usersRepository.updateRecoverPasswordInfo(userId, code)
+    fun updateConfirmCode(userId: Long, code: String) {
+        usersRepository.updateConfirmInfo(userId, code)
+    }
+
+    fun emailConfirm(userId: Long, code: String) {
+        val user = usersRepository.findUserById(userId) ?: throw AuthException("auth.username.exist")
+
+        user.isCodeValid(code)
+
+        usersRepository.updateEmailConfirmation(userId)
     }
 
     fun confirmRecover(recoverConfirmRequest: RecoverConfirmRequest) {
-        val user = usersRepository.findUserById(recoverConfirmRequest.userId)
+        val user = usersRepository.findUserById(recoverConfirmRequest.userId) ?: throw AuthException("auth.username.exist")
 
-        if (!(user?.currentRecoverCode == recoverConfirmRequest.code && now() > user.recoverCodeExpiredAt))
-            throw RecoverPasswordException("auth.otpCode.error")
+        user.isCodeValid(recoverConfirmRequest.code)
 
         sessionsRepository.deleteAllUserSessions(user.id!!)
         usersRepository.updatePassword(user.id, BCrypt.hashpw(recoverConfirmRequest.newPassword, BCrypt.gensalt()))
@@ -105,5 +112,10 @@ class AuthService(
             sessionsRepository.createSession(userId, config.sessionRefreshLiveTimeMin, refreshSession.id)
 
         return TokensBlock(accessSession, refreshSession)
+    }
+
+    private fun User.isCodeValid(code: String){
+        if (!(currentRecoverCode == code && now() > recoverCodeExpiredAt))
+            throw RecoverPasswordException("auth.otpCode.error")
     }
 }

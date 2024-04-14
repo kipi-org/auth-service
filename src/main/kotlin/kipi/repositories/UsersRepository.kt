@@ -4,6 +4,7 @@ import kipi.dao.Users
 import kipi.dao.Users.currentRecoverCode
 import kipi.dao.Users.hashedPassword
 import kipi.dao.Users.id
+import kipi.dao.Users.isEmailConfirmed
 import kipi.dao.Users.recoverCodeExpiredAt
 import kipi.dao.Users.username
 import kipi.dto.User
@@ -39,7 +40,7 @@ class UsersRepository {
         }
     }
 
-    fun updateRecoverPasswordInfo(id: Long, code: String) = transaction {
+    fun updateConfirmInfo(id: Long, code: String) = transaction {
         Users.update({ Users.id eq id }) {
             it[currentRecoverCode] = code
             it[recoverCodeExpiredAt] = now().plusMinutes(3)
@@ -52,11 +53,18 @@ class UsersRepository {
         }
     }
 
+    fun updateEmailConfirmation(id: Long) = transaction {
+        Users.update({ Users.id eq id }) {
+            it[isEmailConfirmed] = true
+        }
+    }
+
     private fun mapToUser(resultRow: ResultRow): User = User(
         id = resultRow[id],
         username = resultRow[username],
         hashedPassword = resultRow[hashedPassword],
         currentRecoverCode = resultRow[currentRecoverCode],
-        recoverCodeExpiredAt = resultRow[recoverCodeExpiredAt]
+        recoverCodeExpiredAt = resultRow[recoverCodeExpiredAt],
+        isEmailConfirmed = resultRow[isEmailConfirmed]
     )
 }

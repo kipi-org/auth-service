@@ -9,5 +9,6 @@ data class User(
     val hashedPassword: String,
     val sessions: List<Session> = emptyList(),
     val currentRecoverCode: String? = null,
-    val recoverCodeExpiredAt: LocalDateTime? = null
+    val recoverCodeExpiredAt: LocalDateTime? = null,
+    val isEmailConfirmed: Boolean = false
 ) : Serializable
