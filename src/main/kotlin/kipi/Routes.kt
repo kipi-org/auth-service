@@ -19,6 +19,20 @@ fun Application.routes(deps: Dependencies) = with(deps) {
             call.respond(OK, sessionResponse)
         }
 
+        route("/email"){
+            post<EmailRequest> {
+                emailController.handle(it)
+
+                call.respond(OK)
+            }
+
+            post<EmailConfirmRequest>("/confirm") {
+                emailConfirmController.handle(it)
+
+                call.respond(OK)
+            }
+        }
+
         post<EmailConfirmRequest>("/email/confirm") {
             emailConfirmController.handle(it)
 

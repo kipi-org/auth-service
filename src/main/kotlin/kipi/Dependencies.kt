@@ -15,7 +15,7 @@ class Dependencies {
     private val authService = AuthService(usersRepository, sessionsRepository, config)
     private val notificationService = NotificationService(config)
 
-    val registrationController = RegistrationController(authService, notificationService)
+    val registrationController = RegistrationController(authService)
     val loginController = LoginController(authService)
     val loginByIdController = LoginByIdController(authService)
     val logoutController = LogoutController(authService)
@@ -24,5 +24,6 @@ class Dependencies {
     val revokeController = RevokeController(authService)
     val recoverController = RecoverController(notificationService, authService)
     val recoverConfirmController = RecoverConfirmController(authService)
+    val emailController = EmailController(authService, notificationService)
     val emailConfirmController = EmailConfirmController(authService)
 }

@@ -106,6 +106,8 @@ class AuthService(
         usersRepository.updatePassword(user.id, BCrypt.hashpw(recoverConfirmRequest.newPassword, BCrypt.gensalt()))
     }
 
+    fun findUser(userId: Long) = usersRepository.findUserById(userId)
+
     private fun createSessions(userId: Long): TokensBlock {
         val refreshSession = sessionsRepository.createSession(userId, config.sessionRefreshLiveTimeMin)
         val accessSession =
