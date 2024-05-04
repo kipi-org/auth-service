@@ -19,6 +19,9 @@ class UsersRepository {
         Users.insert {
             it[username] = user.username
             it[hashedPassword] = user.hashedPassword
+            it[currentRecoverCode] = user.currentRecoverCode
+            it[recoverCodeExpiredAt] = user.recoverCodeExpiredAt
+            it[isEmailConfirmed] = user.isEmailConfirmed
         }[Users.id]
     }
 
