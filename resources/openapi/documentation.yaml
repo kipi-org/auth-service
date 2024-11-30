@@ -1,0 +1,266 @@
+openapi: "3.1.0"
+info:
+  title: "auth_service API"
+  description: "auth_service API"
+  version: "1.0.0"
+servers:
+- url: "http://178.250.159.172:7005"
+paths:
+  /health:
+    get:
+      tags:
+        - "Service"
+      responses:
+        "200":
+          description: "OK"
+  /registration:
+    post:
+      tags:
+        - "Main process"
+      description: "Регистрация в системе"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+      responses:
+        "200":
+          description: "Токены"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+  /email:
+    post:
+      tags:
+        - "Email confirm"
+      description: "Подтверждение почты"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailRequest"
+      responses:
+        "200":
+          description: "Смс код отправлен на почту"
+  /email/confirm:
+    post:
+      tags:
+        - "Email confirm"
+      description: "Подтверждение кода с почты"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailRequest"
+      responses:
+        "200":
+          description: "Смс код отправлен на почту"
+  /login:
+    post:
+      tags:
+        - "Main process"
+      description: "Логин в системе"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+      responses:
+        "200":
+          description: "Токены"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+  /loginById:
+    post:
+      tags:
+        - "Main process"
+      description: "Логин в системе по id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdCredentials"
+      responses:
+        "200":
+          description: "Токены"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+  /logout:
+    post:
+      tags:
+        - "Main process"
+      description: "Логаут по токену"
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+          description: "Access token"
+      responses:
+        "200":
+          description: "Токены удалены"
+  /recover:
+    post:
+      tags:
+        - "Recover password"
+      description: "Восстановление пароля"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecoverRequest"
+      responses:
+        "200":
+          description: "Смс код отправлен на почту"
+  /recover/confirm:
+    post:
+      tags:
+        - "Recover password"
+      description: "Подтверждение восстановление пароля"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecoverConfirmRequest"
+      responses:
+        "200":
+          description: "Пароль изменён"
+  /verify:
+    get:
+      tags:
+        - "Tokens"
+      description: "Верификация токена"
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+          description: "Access token"
+      responses:
+        "200":
+          description: "Токены"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+  /revoke:
+    post:
+      tags:
+        - "Tokens"
+      description: "Обновление токена"
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+          description: "Refresh token"
+      responses:
+        "200":
+          description: "Токены"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SessionResponse"
+  /user/{userId}:
+    delete:
+      tags:
+        - "Delete"
+      description: "Удаление информации о пользователе"
+      parameters:
+      - name: "userId"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Успешно"
+components:
+  schemas:
+    ErrorResponse:
+      type: "object"
+      properties:
+        message:
+          type: "string"
+      required:
+      - "message"
+    ValidationError:
+      type: "object"
+      properties:
+        field:
+          type: "string"
+        message:
+          type: "string"
+      required:
+      - "field"
+    SessionResponse:
+      type: "object"
+      properties:
+        userId:
+          type: "integer"
+          format: "int64"
+        refreshToken:
+          type: "string"
+        accessToken:
+          type: "string"
+      required:
+      - "accessToken"
+    EmailRequest:
+      type: "object"
+      properties:
+        userId:
+          type: "integer"
+        email:
+          type: string
+    EmailConfirmRequest:
+      type: "object"
+      properties:
+        userId:
+          type: "integer"
+        code:
+          type: string
+    RecoverRequest:
+      type: object
+      properties:
+        userId:
+          type: "integer"
+        email:
+          type: string
+    RecoverConfirmRequest:
+      type: object
+      properties:
+        userId:
+          type: "integer"
+        code:
+          type: string
+        newPassword:
+          type: string
+    Credentials:
+      type: "object"
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    IdCredentials:
+      type: object
+      properties:
+        id:
+          type: "integer"
+        password:
+          type: string

@@ -9,7 +9,6 @@ RUN ./gradlew --no-daemon build
 COPY . .
 RUN ./gradlew --no-daemon clean build
 ENV TZ=Europe/Moscow
-EXPOSE 7002/tcp
 
 ENV ARTIFACT_NAME=auth-service-all.jar
 ENTRYPOINT exec java -jar ./build/libs/$ARTIFACT_NAME
