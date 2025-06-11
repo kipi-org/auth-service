@@ -1,4 +1,4 @@
-ARG BUILDER_IMG="openjdk:17-jdk-slim"
+ARG BUILDER_IMG="openjdk:21"
 
 FROM ${BUILDER_IMG} AS builder
 RUN mkdir -p /app
