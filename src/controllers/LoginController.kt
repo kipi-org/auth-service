@@ -16,9 +16,8 @@ class LoginController(
         val sessions = authService.loginConfirm(otpConfirmationRequest.phoneNumber, otpConfirmationRequest.otpCode)
 
         return SessionResponse(
-            sessions.refreshSession.userId,
-            sessions.refreshSession.token,
-            sessions.accessSession.token
+            sessions.accessSession.userId,
+            sessions.accessSession.token,
         )
     }
 }

@@ -43,12 +43,6 @@ fun Application.routes(deps: Dependencies) = with(deps) {
 
             call.respond(OK, sessionResponse)
         }
-
-        post("/revoke") {
-            val sessionResponse = revokeController.handle(call.token)
-
-            call.respond(OK, sessionResponse)
-        }
     }
 }
 

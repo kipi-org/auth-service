@@ -36,11 +36,7 @@ class AuthService(
     fun logout(token: String) {
         val session = sessionsRepository.findSession(token)
 
-        when {
-            session == null -> return
-            session.refreshToken == null -> return
-            else -> sessionsRepository.forceDeleteSession(session.id, session.refreshToken)
-        }
+        sessionsRepository.forceDeleteSession(session!!.id)
     }
 
     fun deleteUser(userId: Long) {
@@ -51,31 +47,15 @@ class AuthService(
     fun verify(token: String): Session {
         val session = sessionsRepository.findSession(token) ?: throw SessionException("auth.session.not.exist")
 
-        if (session.refreshToken == null) throw SessionException("auth.session.illegal.token")
         if (session.expiredAt <= now()) throw SessionException("auth.session.expired")
 
         return session
     }
 
-    fun revoke(refreshToken: String): Session {
-        val refreshSession =
-            sessionsRepository.findSession(refreshToken) ?: throw SessionException("auth.session.not.exist")
-
-        if (refreshSession.refreshToken != null) throw SessionException("auth.session.illegal.token")
-        if (refreshSession.expiredAt <= now()) throw SessionException("auth.session.expired")
-
-        return sessionsRepository.createSession(
-            refreshSession.userId,
-            config.sessionAccessLiveTimeMin,
-            refreshSession.id
-        )
-    }
-
     private fun createSessions(userId: Long): TokensBlock {
-        val refreshSession = sessionsRepository.createSession(userId, config.sessionRefreshLiveTimeMin)
         val accessSession =
-            sessionsRepository.createSession(userId, config.sessionRefreshLiveTimeMin, refreshSession.id)
+            sessionsRepository.createSession(userId, config.sessionAccessLiveTimeMin)
 
-        return TokensBlock(accessSession, refreshSession)
+        return TokensBlock(accessSession)
     }
 }

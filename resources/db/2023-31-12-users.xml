@@ -32,4 +32,8 @@
         </createTable>
         <createSequence sequenceName="session_id_seq"/>
     </changeSet>
+
+    <changeSet id="202506111425" author="masadf">
+        <dropColumn tableName="sessions" columnName="refreshTokenId"/>
+    </changeSet>
 </databaseChangeLog>

@@ -9,5 +9,4 @@ data class Session(
     val token: String,
     val expiredAt: LocalDateTime,
     val initAt: LocalDateTime,
-    val refreshToken: Long?
 ) : Serializable

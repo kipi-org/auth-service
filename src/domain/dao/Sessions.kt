@@ -9,6 +9,5 @@ object Sessions : Table("sessions") {
     val token = varchar("token", 255)
     val expiredAt = datetime("expiredAt")
     val initAt = datetime("initAt")
-    val refreshToken = long("refreshTokenId").nullable()
     override val primaryKey = PrimaryKey(id)
 }

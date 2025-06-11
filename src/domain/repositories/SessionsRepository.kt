@@ -4,7 +4,6 @@ import domain.dao.Sessions
 import domain.dao.Sessions.expiredAt
 import domain.dao.Sessions.id
 import domain.dao.Sessions.initAt
-import domain.dao.Sessions.refreshToken
 import domain.dao.Sessions.token
 import domain.dao.Sessions.userId
 import domain.dto.Session
@@ -17,7 +16,7 @@ import java.util.*
 
 class SessionsRepository {
 
-    fun createSession(id: Long, sessionLiveTimeMin: Long, refreshTokenId: Long? = null) = transaction {
+    fun createSession(id: Long, sessionLiveTimeMin: Long) = transaction {
         val now = now()
 
         Sessions.insert {
@@ -25,16 +24,11 @@ class SessionsRepository {
             it[token] = UUID.randomUUID().toString()
             it[expiredAt] = now.plusMinutes(sessionLiveTimeMin)
             it[initAt] = now
-            it[refreshToken] = refreshTokenId
         }.resultedValues?.map { mapToSession(it) }?.firstOrNull() ?: throw SessionException("auth.session.not.created")
     }
 
-    fun forceDeleteSession(id: Long, refreshTokenId: Long) = transaction {
-        Sessions.deleteWhere {
-            (Sessions.id eq id) or
-                    (refreshToken eq refreshTokenId) or
-                    (Sessions.id eq refreshTokenId)
-        }
+    fun forceDeleteSession(id: Long) = transaction {
+        Sessions.deleteWhere { (Sessions.id eq id) }
     }
 
     fun deleteAllUserSessions(userId: Long) = transaction {
@@ -57,6 +51,5 @@ class SessionsRepository {
         token = resultRow[token],
         expiredAt = resultRow[expiredAt],
         initAt = resultRow[initAt],
-        refreshToken = resultRow[refreshToken]
     )
 }
